@@ -43,10 +43,10 @@ docker run --rm -it -v $(pwd):/data epicsoft/zitadel-tools zitadel-tools basicau
 ### Create JWT
 
 ```bash
-docker run --rm -it -v $(pwd):/data epicsoft/zitadel-tools openssl genrsa -out /data/superuser.pem 4096
-docker run --rm -it -v $(pwd):/data epicsoft/zitadel-tools openssl rsa -in /data/superuser.pem -outform PEM -pubout -out /data/superuser.pub
-docker run --rm -it -v $(pwd):/data epicsoft/zitadel-tools openssl rsa -in /data/superuser.pem -out /data/superuser.rsa.pem -traditional
-docker run --rm -it -v $(pwd):/data epicsoft/zitadel-tools zitadel-tools key2jwt --audience=https://example.com --key=/data/superuser.rsa.pem --issuer=superuser --output=/data/jwt.txt
+docker run --rm -it -v $(pwd):/data epicsoft/zitadel-tools openssl genrsa -out /data/superuser.pem 4096 \
+&& docker run --rm -it -v $(pwd):/data epicsoft/zitadel-tools openssl rsa -in /data/superuser.pem -outform PEM -pubout -out /data/superuser.pub \
+&& docker run --rm -it -v $(pwd):/data epicsoft/zitadel-tools openssl rsa -in /data/superuser.pem -out /data/superuser.rsa.pem -traditional \
+&& docker run --rm -it -v $(pwd):/data epicsoft/zitadel-tools zitadel-tools key2jwt --audience=https://example.com --key=/data/superuser.rsa.pem --issuer=superuser --output=/data/jwt.txt
 ```
 
 ## License
