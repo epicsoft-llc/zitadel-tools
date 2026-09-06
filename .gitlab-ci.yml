@@ -28,8 +28,9 @@ latest:
     VERSION: "latest"
   script:
     - echo "Build Docker image for Zitadel Tools with version '${VERSION}'"
-    - docker buildx use epicbuilder > /dev/null 2>&1 || docker buildx create --name epicbuilder --use > /dev/null 2>&1 && docker buildx inspect epicbuilder --bootstrap > /dev/null 2>&1
-    - docker buildx build . --push --pull --no-cache
+    - docker buildx create --name epicbuilder --driver docker-container --use || docker buildx use epicbuilder
+    - docker buildx inspect epicbuilder --bootstrap
+    - docker buildx build --builder epicbuilder . --push --pull --no-cache
         --platform linux/amd64,linux/arm64
         -t ${CI_REGISTRY_IMAGE}:${VERSION}
         -t ${DOCKER_REGISTRY}:${VERSION}
