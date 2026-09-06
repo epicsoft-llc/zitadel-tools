@@ -51,6 +51,6 @@ docker run --rm -it -v $(pwd):/data epicsoft/zitadel-tools openssl genrsa -out /
 
 ## License
 
-MIT License see [LICENSE](https://gitlab.com/epicsoft-networks/azure-devops-backup/blob/main/LICENSE)
+MIT License see [LICENSE](https://gitlab.com/epicsoft-networks/zitadel-tools/blob/main/LICENSE)
 
 Please note that the MIT license only applies to the files created by epicsoft LLC. Other software may be licensed under other licenses.
