@@ -3,36 +3,45 @@
 ###############################################################################
 FROM golang:alpine AS builder
 
-RUN apk add --no-cache git
+ARG ZITADEL_TOOLS_VERSION="latest"
+ARG BUILD_DATE="development"
 
-WORKDIR /tools
-
-RUN go install github.com/zitadel/zitadel-tools@latest
+#### the ldflags of the upstream release build - without them 'zitadel-tools --version' says "dev"
+RUN case "${ZITADEL_TOOLS_VERSION}" in latest|v*) query="${ZITADEL_TOOLS_VERSION}" ;; *) query="v${ZITADEL_TOOLS_VERSION}" ;; esac \
+ && version=$(go list -m -f '{{.Version}}' "github.com/zitadel/zitadel-tools@${query}") \
+ && commit=$(go list -m -f '{{with .Origin}}{{.Hash}}{{end}}' "github.com/zitadel/zitadel-tools@${version}") \
+ && CGO_ENABLED=0 go install -trimpath \
+      -ldflags "-s -w -X main.version=${version#v} -X main.commit=${commit:-none} -X main.date=${BUILD_DATE}" \
+      "github.com/zitadel/zitadel-tools@${version}"
 
 ###############################################################################
 #### Image
 ###############################################################################
 FROM alpine:latest
 
-ARG BUILD_DATE
-LABEL org.label-schema.name="Zitadel Tools" \
-      org.label-schema.description="Docker image for Zitadel Tools based on official Alpine image" \
+ARG ZITADEL_TOOLS_VERSION="latest"
+ARG BUILD_DATE="development"
+LABEL org.label-schema.name="ZITADEL Tools" \
+      org.label-schema.description="ZITADEL Tools (key2jwt, basicauth, migrate) with OpenSSL on Alpine - multi-platform, rebuilt weekly" \
       org.label-schema.vendor="epicsoft LLC / Alexander Schwarz <info@epicsoft.one>" \
-      org.label-schema.version=latest \
+      org.label-schema.url="https://gitlab.com/epicsoft-networks/zitadel-tools" \
+      org.label-schema.vcs-url="https://gitlab.com/epicsoft-networks/zitadel-tools/-/tree/main" \
+      org.label-schema.version=${ZITADEL_TOOLS_VERSION} \
       org.label-schema.schema-version="1.0" \
       org.label-schema.build-date=${BUILD_DATE}
 
 LABEL image.name="epicsoft_zitadel_tools" \
-      image.description="Docker image for Zitadel Tools based on official Alpine image" \
+      image.description="ZITADEL Tools (key2jwt, basicauth, migrate) with OpenSSL on Alpine - multi-platform, rebuilt weekly" \
+      image.zitadel-tools.version=${ZITADEL_TOOLS_VERSION} \
       maintainer="epicsoft LLC" \
       maintainer.name="Alexander Schwarz <info@epicsoft.one>" \
       maintainer.copyright="Copyright 2024-2026 epicsoft LLC / Alexander Schwarz" \
       license="MIT"
 
-RUN apk --no-cache add openssl \
-                       ca-certificates \
- && update-ca-certificates \
- && rm -rf /var/cache/apk/*
+#### packages of the base image lag behind the Alpine repository - the upgrade brings their security fixes
+RUN apk --no-cache upgrade \
+ && apk --no-cache add openssl \
+                       ca-certificates
 
 COPY --from=builder /go/bin/zitadel-tools /usr/local/bin/zitadel-tools
 
