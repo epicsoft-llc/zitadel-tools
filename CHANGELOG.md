@@ -10,7 +10,7 @@ Alpine packages and the current Go toolchain. Which zitadel-tools version a part
 docker image inspect --format '{{index .Config.Labels "image.zitadel-tools.version"}}' epicsoft/zitadel-tools:1
 ```
 
-Entries here are dated, because there is no number to give them.
+Entries here are dated, because there is no number to give them. Each date is also a git tag with a release on GitHub.
 
 ---
 
@@ -24,7 +24,7 @@ Entries here are dated, because there is no number to give them.
   were missing.
 - Every image goes through `test/smoke.sh` before it is pushed, on every platform: version, `basicauth`, and
   `key2jwt` with a key created by the image's OpenSSL, from a file and from stdin - all as an unprivileged user.
-- A mirror on GitHub: `github.com/epicsoft-llc/zitadel-tools`.
+- A mirror on GitHub, `github.com/epicsoft-llc/zitadel-tools`, with a release for every entry of this changelog.
 
 ### Changed
 

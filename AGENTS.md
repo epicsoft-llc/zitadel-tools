@@ -59,6 +59,11 @@ Build with `--pull --no-cache` when checking a change the way the pipeline does 
 The image has no version number of its own; the tags are zitadel-tools versions, rebuilt weekly. `CHANGELOG.md`
 therefore has dated entries.
 
+**Git tags and GitHub releases:** a git tag is the date of a `CHANGELOG.md` entry, such as `2026-10-19`, set on the
+green commit of the default branch that carries the entry. Until then the entry may still grow; once tagged it is
+fixed, and a correction goes into the next entry. A tag pipeline runs only `github-release`, which waits for the tag on
+GitHub and creates the release from that entry. Tags are protected, because `GITHUB_TOKEN` is a protected variable.
+
 The `build` job resolves the newest upstream version once (`go list -m ...@latest`), so both platforms build the same
 one, and passes it as `ZITADEL_TOOLS_VERSION`. Each platform is built, loaded and smoke-tested before the
 multi-platform push, which reuses those layers from the builder cache. The `docker:dind` service runs with TLS, which
@@ -67,7 +72,7 @@ buildx only takes from a Docker context - hence `docker context create dind` bef
 runner tag `imagex`. Publishing happens only from the default branch and the weekly schedule. A new major release
 upstream needs no change here: the job derives the tags from the version.
 
-CI variables: `DOCKER_HUB_USER`, `DOCKER_HUB_TOKEN` (masked, protected). The tokens go in over stdin and through the
+CI variables: `DOCKER_HUB_USER` (protected), `DOCKER_HUB_TOKEN` and `GITHUB_TOKEN` (masked, protected). The tokens go in over stdin and through the
 environment, never onto a command line.
 
 **GitHub mirror:** a push mirror in the GitLab project settings (Repository → Mirroring repositories) with its own
